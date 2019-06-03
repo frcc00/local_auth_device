@@ -64,32 +64,42 @@
                                                                                    completion:nil];
 }
 
+//if (context.biometryType == LABiometryTypeFaceID) {
+//    [biometrics addObject:@"face"];
+//} else if (context.biometryType == LABiometryTypeTouchID) {
+//    [biometrics addObject:@"fingerprint"];
+//}
+
 - (void)getAvailableBiometrics:(FlutterResult)result {
   LAContext *context = [[LAContext alloc] init];
   NSError *authError = nil;
   NSMutableArray<NSString *> *biometrics = [[NSMutableArray<NSString *> alloc] init];
-  if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-                           error:&authError]) {
-    if (authError == nil) {
-      if (@available(iOS 11.0.1, *)) {
-        if (context.biometryType == LABiometryTypeFaceID) {
-          [biometrics addObject:@"face"];
-        } else if (context.biometryType == LABiometryTypeTouchID) {
-          [biometrics addObject:@"fingerprint"];
+    BOOL supportEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError];
+    if (@available(iOS 11.0, *)) {
+        if (context.biometryType == LABiometryTypeTouchID) {
+            // 指纹
+            if (authError) {
+                [biometrics addObject:@"fingerprint"];
+            } else {
+                [biometrics addObject:@"fingerprint"];
+            }
+        }else if (context.biometryType == LABiometryTypeFaceID) {
+            // 面容
+            if (authError) {
+                [biometrics addObject:@"face"];
+            } else {
+                [biometrics addObject:@"face"];
+            }
+        }else {
+            // 不支持
         }
-      }
+    } else {
+        if (authError) {
+            [biometrics addObject:@"fingerprint"];
+        } else {
+            [biometrics addObject:@"fingerprint"];
+        }
     }
-  } else if (authError.code == LAErrorTouchIDNotEnrolled) {
-    [biometrics addObject:@"undefined"];
-  } else if (authError.code == LAErrorTouchIDNotAvailable) {
-    [biometrics addObject:@"LAErrorTouchIDNotAvailable"];
-  } else if (@available(iOS 11.0, *)) {
-      if (authError.code == LAErrorBiometryNotAvailable) {
-          [biometrics addObject:@"LAErrorBiometryNotAvailable"];
-      }
-  } else {
-      // Fallback on earlier versions
-  }
   result(biometrics);
 }
 
