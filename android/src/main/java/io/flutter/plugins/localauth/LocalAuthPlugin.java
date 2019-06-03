@@ -83,7 +83,7 @@ public class LocalAuthPlugin implements MethodCallHandler {
           if (fingerprintMgr.hasEnrolledFingerprints()) {
             biometrics.add("fingerprint");
           } else {
-            biometrics.add("undefined");
+            biometrics.add("fingerprint");
           }
         }
         result.success(biometrics);
