@@ -81,6 +81,14 @@
     }
   } else if (authError.code == LAErrorTouchIDNotEnrolled) {
     [biometrics addObject:@"undefined"];
+  } else if (authError.code == LAErrorTouchIDNotAvailable) {
+    [biometrics addObject:@"LAErrorTouchIDNotAvailable"];
+  } else if (@available(iOS 11.0, *)) {
+      if (authError.code == LAErrorBiometryNotAvailable) {
+          [biometrics addObject:@"LAErrorBiometryNotAvailable"];
+      }
+  } else {
+      // Fallback on earlier versions
   }
   result(biometrics);
 }
